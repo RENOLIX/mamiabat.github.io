@@ -28,8 +28,34 @@ jobs:
         run: npm install
       - name: Build
         run: npm run build
-      - name: Add SPA fallback
-        run: cp dist/index.html dist/404.html
+      - name: Add route fallbacks
+        run: |
+          cp dist/index.html dist/404.html
+          routes=(
+            how-we-help
+            case-studies
+            equipment
+            resources
+            about
+            contact
+            services/freight-forwarding
+            services/ship-agency
+            services/special-transport
+            services/heavy-lift
+            equipment/thp-sl
+            equipment/extendable-trailers
+            equipment/tramway-trailers
+            equipment/conventional-trailers
+            equipment/transport-accessories
+            equipment/skidding
+            equipment/sbl-gantries
+            equipment/hydraulic-equipment
+            equipment/heavy-haul-tractors
+          )
+          for route in "${routes[@]}"; do
+            mkdir -p "dist/$route"
+            cp dist/index.html "dist/$route/index.html"
+          done
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
