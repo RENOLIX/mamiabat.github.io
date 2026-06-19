@@ -289,7 +289,7 @@ img {
 .hero-media {
   background:
     linear-gradient(110deg, rgba(0, 0, 0, 0.48), transparent 56%),
-    url("/media/whtl/received_1386292979996984.jpeg") center / cover;
+    url("/media/whtl/hero-trailer-hd.webp") center / cover;
   transform: scale(1.03);
 }
 
