@@ -1,6 +1,8 @@
 import {
   ArrowRight,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Factory,
   Globe2,
   Mail,
@@ -15,7 +17,7 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type NavPage =
   | "home"
@@ -60,14 +62,21 @@ type Equipment = {
   body: string;
 };
 
+type MediaItem = {
+  src: string;
+  type: "image" | "video";
+  label: string;
+};
+
+const mediaPath = (file: string) => `${import.meta.env.BASE_URL}media/whtl/${file}`;
+
 const sectors: Sector[] = [
   {
     key: "energy",
     label: "Énergie",
     eyebrow: "Transformateurs, centrales, réseaux",
     icon: Factory,
-    image:
-      "https://images.unsplash.com/photo-1513828583688-c52646db42da?auto=format&fit=crop&w=1600&q=85",
+    image: mediaPath("received_1386292979996984.jpeg"),
     links: ["Transport de transformateurs", "Montage industriel", "Livraison sur site"],
     summary:
       "Transport, levage et installation d'équipements lourds pour les projets énergétiques.",
@@ -77,8 +86,7 @@ const sectors: Sector[] = [
     label: "Maritime & ports",
     eyebrow: "Navires, Ro-Ro, breakbulk",
     icon: Ship,
-    image:
-      "https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=1600&q=85",
+    image: mediaPath("received_866480676022580.jpeg"),
     links: ["Consignation des navires", "Opérations portuaires", "Fret Heavy Lift"],
     summary:
       "Organisation des escales, coordination portuaire et suivi des cargaisons conventionnelles ou hors gabarit.",
@@ -88,8 +96,7 @@ const sectors: Sector[] = [
     label: "Infrastructure",
     eyebrow: "Routes, ouvrages, plateformes",
     icon: TowerControl,
-    image:
-      "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=1600&q=85",
+    image: mediaPath("received_1198032315753716.jpeg"),
     links: ["Route survey", "Aménagement routier", "Renforcement d'ouvrages"],
     summary:
       "Préparation et sécurisation des itinéraires nécessaires au passage des convois exceptionnels.",
@@ -99,8 +106,7 @@ const sectors: Sector[] = [
     label: "Industrie",
     eyebrow: "Usines, équipements, projets complexes",
     icon: Zap,
-    image:
-      "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1600&q=85",
+    image: mediaPath("received_1371596501494574.jpeg"),
     links: ["Manutention lourde", "Skidding", "Coordination de projet"],
     summary:
       "Des méthodes complètes, de l'étude technique à l'installation finale sur site.",
@@ -112,10 +118,8 @@ const services: Service[] = [
     slug: "freight-forwarding",
     title: "Freight Forwarding",
     kicker: "Transport multimodal",
-    image:
-      "https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=1600&q=85",
-    hero:
-      "https://images.unsplash.com/photo-1565793298595-6a879b1d9492?auto=format&fit=crop&w=2200&q=90",
+    image: mediaPath("received_802329992847985.jpeg"),
+    hero: mediaPath("received_866480676022580.jpeg"),
     intro:
       "Organisation du transport maritime, terrestre et multimodal, avec coordination logistique, douanière et suivi opérationnel des cargaisons.",
     bullets: ["Étude logistique", "Transport multimodal", "Coordination douanière", "Suivi des cargaisons"],
@@ -125,10 +129,8 @@ const services: Service[] = [
     slug: "ship-agency",
     title: "Consignation maritime",
     kicker: "Ship Agency Services",
-    image:
-      "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=85",
-    hero:
-      "https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&w=2200&q=90",
+    image: mediaPath("received_866480676022580.jpeg"),
+    hero: mediaPath("received_802329992847985.jpeg"),
     intro:
       "Gestion des opérations portuaires, consignation des navires et coordination de tous les intervenants pendant l'escale.",
     bullets: ["Préparation d'escale", "Consignation navire", "Coordination portuaire", "Suivi documentaire"],
@@ -138,10 +140,8 @@ const services: Service[] = [
     slug: "special-transport",
     title: "Transport spécial",
     kicker: "Heavy Transport Engineering",
-    image:
-      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1600&q=85",
-    hero:
-      "https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=2200&q=90",
+    image: mediaPath("received_1386292979996984.jpeg"),
+    hero: mediaPath("received_1045389137822869.jpeg"),
     intro:
       "Études de transport, route survey, autorisations, aménagement des itinéraires et supervision complète des convois exceptionnels.",
     bullets: ["Route survey", "Calculs de stabilité", "Autorisations de circulation", "Escorte technique"],
@@ -151,10 +151,8 @@ const services: Service[] = [
     slug: "heavy-lift",
     title: "Heavy Lift & industrie",
     kicker: "Levage et manutention lourde",
-    image:
-      "https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?auto=format&fit=crop&w=1600&q=85",
-    hero:
-      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=2200&q=90",
+    image: mediaPath("received_1371596501494574.jpeg"),
+    hero: mediaPath("received_1356612209698063.jpeg"),
     intro:
       "Levage, manutention lourde, montage d'équipements industriels et transformateurs, skidding et distribution jusqu'au site final.",
     bullets: ["Plans de levage", "Montage industriel", "Skidding", "Livraison sur site"],
@@ -167,7 +165,7 @@ const equipment: Equipment[] = [
     slug: "thp-sl",
     title: "Remorques THP/SL",
     category: "Transport",
-    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Crawler_crane_2.jpg?width=1600",
+    image: mediaPath("received_1003047622117156.jpeg"),
     capacity: "40 lignes · 45 T par ligne",
     body: "Remorques modulaires hydrauliques configurables pour les colis lourds et hors gabarit.",
   },
@@ -175,7 +173,7 @@ const equipment: Equipment[] = [
     slug: "extendable-trailers",
     title: "Remorques extensibles",
     category: "Transport",
-    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Mobile_Cranes.jpg?width=1600",
+    image: mediaPath("received_1386292979996984.jpeg"),
     capacity: "8 unités · 60 à 90 T · jusqu'à 34 m",
     body: "Remorques extra surbaissées pour les pièces longues, industrielles et exceptionnelles.",
   },
@@ -183,8 +181,7 @@ const equipment: Equipment[] = [
     slug: "tramway-trailers",
     title: "Remorques tramway",
     category: "Transport",
-    image:
-      "https://commons.wikimedia.org/wiki/Special:FilePath/SCHEUERLE_SPMTs_moving_a_ship_section.jpg?width=1600",
+    image: mediaPath("received_955162737508959.jpeg"),
     capacity: "2 semi-remorques hydrauliques",
     body: "Équipements spécialisés dédiés au transport sécurisé de tramways.",
   },
@@ -192,8 +189,7 @@ const equipment: Equipment[] = [
     slug: "conventional-trailers",
     title: "Semi-remorques conventionnelles",
     category: "Transport",
-    image:
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Seitentr%C3%A4gerbr%C3%BCcke_STB_1000.jpg?width=1600",
+    image: mediaPath("received_999301006187703.jpeg"),
     capacity: "5 porte-chars 54 T · 5 plateaux 30 T",
     body: "Une flotte conventionnelle pour le transport industriel et la distribution sur site.",
   },
@@ -201,8 +197,7 @@ const equipment: Equipment[] = [
     slug: "transport-accessories",
     title: "Accessoires techniques",
     category: "Ingénierie",
-    image:
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Haseltalbr%C3%BCcke-Litzenheber.jpg?width=1600",
+    image: mediaPath("received_1444943581007746.jpeg"),
     capacity: "Plaque tournante 250 T",
     body: "Plateau visselle de 9 m, plateaux de 3 m et 6 m, et splites pour configurations à 3 files.",
   },
@@ -210,8 +205,7 @@ const equipment: Equipment[] = [
     slug: "skidding",
     title: "Skidding & manutention",
     category: "Manutention",
-    image:
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Freybr%C3%BCcke_Berlin-Spandau-Juni_2016-26-DSCF0158.jpg?width=1600",
+    image: mediaPath("received_1331889581640544.jpeg"),
     capacity: "Skidding 400 T · turntable 100 T",
     body: "20 quais marteaux avec poutres et pieds d'éléphant, jusqu'à 100 T par kit.",
   },
@@ -219,7 +213,7 @@ const equipment: Equipment[] = [
     slug: "sbl-gantries",
     title: "Portiques SBL",
     category: "Levage",
-    image: "https://commons.wikimedia.org/wiki/Special:FilePath/TAISUN_with_SCARABEO_9.JPG?width=1600",
+    image: mediaPath("received_1371596501494574.jpeg"),
     capacity: "SBL 1100 T et SBL 1000 T",
     body: "Portiques disponibles en partenariat avec SBL pour les opérations industrielles lourdes.",
   },
@@ -227,7 +221,7 @@ const equipment: Equipment[] = [
     slug: "hydraulic-equipment",
     title: "Équipements hydrauliques",
     category: "Levage",
-    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Lima_crane_TOMH_on_pontoon,_pic4.JPG?width=1600",
+    image: mediaPath("received_1208302758027984.jpeg"),
     capacity: "2 centrales 700 bars · vérins 20 à 100 T",
     body: "Centrales hydrauliques à vérins et vérins double effet pour levage et positionnement contrôlés.",
   },
@@ -235,8 +229,7 @@ const equipment: Equipment[] = [
     slug: "heavy-haul-tractors",
     title: "Tracteurs Heavy Haul",
     category: "Tracteurs",
-    image:
-      "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=85",
+    image: mediaPath("received_1394859562701361.jpeg"),
     capacity: "10 tracteurs · jusqu'à 250 PTRA",
     body: "Astra 8x6 et 6x4, Scania 6x4 et Volvo 6x4 pour les convois exceptionnels.",
   },
@@ -246,26 +239,22 @@ const cases = [
   {
     title: "Transport exceptionnel de transformateur",
     sector: "Énergie",
-    image:
-      "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=1600&q=85",
+    image: mediaPath("Messenger_creation_1937362816978940.jpeg"),
   },
   {
     title: "Coordination portuaire d'un colis hors gabarit",
     sector: "Maritime",
-    image:
-      "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1600&q=85",
+    image: mediaPath("received_866480676022580.jpeg"),
   },
   {
     title: "Préparation d'itinéraire pour convoi exceptionnel",
     sector: "Infrastructure",
-    image:
-      "https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=1600&q=85",
+    image: mediaPath("received_1198032315753716.jpeg"),
   },
   {
     title: "Montage et manutention d'un équipement industriel",
     sector: "Industrie",
-    image:
-      "https://images.unsplash.com/photo-1513828583688-c52646db42da?auto=format&fit=crop&w=1600&q=85",
+    image: mediaPath("received_1371596501494574.jpeg"),
   },
 ];
 
@@ -308,6 +297,71 @@ const authorities = [
   "Hydraulique",
   "PTT / Télécommunications",
   "Autorités locales et administratives",
+];
+
+const mediaLibrary: MediaItem[] = [
+  ...[
+    "Messenger_creation_1937362816978940.jpeg",
+    "received_802329992847985.jpeg",
+    "received_866480676022580.jpeg",
+    "received_887420564401378.jpeg",
+    "received_890155810071081.jpeg",
+    "received_936903929268456.jpeg",
+    "received_955162737508959.jpeg",
+    "received_956251707447890.jpeg",
+    "received_966870903022210.jpeg",
+    "received_977450534914970.jpeg",
+    "received_988411333817139.jpeg",
+    "received_988487630841753.jpeg",
+    "received_988493003968586.jpeg",
+    "received_989742480481622.jpeg",
+    "received_996973289743168.jpeg",
+    "received_998725409750150.jpeg",
+    "received_999301006187703.jpeg",
+    "received_1000214875965913.jpeg",
+    "received_1000858432538810.jpeg",
+    "received_1003047622117156.jpeg",
+    "received_1008281338413737.jpeg",
+    "received_1010971521555953.jpeg",
+    "received_1027466850223507.jpeg",
+    "received_1044548101257624.jpeg",
+    "received_1045389137822869.jpeg",
+    "received_1073536042006820.jpeg",
+    "received_1198032315753716.jpeg",
+    "received_1208302758027984.jpeg",
+    "received_1216452338212553.jpeg",
+    "received_1266084618934500.jpeg",
+    "received_1297286879157233.jpeg",
+    "received_1323509056561372.jpeg",
+    "received_1330716475154330.jpeg",
+    "received_1331889581640544.jpeg",
+    "received_1356612209698063.jpeg",
+    "received_1363241306006412.jpeg",
+    "received_1371596501494574.jpeg",
+    "received_1386292979996984.jpeg",
+    "received_1391580972780442.jpeg",
+    "received_1394859562701361.jpeg",
+    "received_1436136948389622.jpeg",
+    "received_1444943581007746.jpeg",
+    "received_1478619903572628.jpeg",
+    "received_1479769170126303.jpeg",
+  ].map((file, index) => ({
+    src: mediaPath(file),
+    type: "image" as const,
+    label: `Opération terrain WHTL ${String(index + 1).padStart(2, "0")}`,
+  })),
+  ...[
+    "Messenger_creation_1146001201340227.mp4",
+    "Messenger_creation_1229799505801135.mp4",
+    "Messenger_creation_1272455534966625.mp4",
+    "Messenger_creation_2468311783684212.mp4",
+    "Messenger_creation_3074525309411973.mp4",
+    "Messenger_creation_3467957750034993.mp4",
+  ].map((file, index) => ({
+    src: mediaPath(file),
+    type: "video" as const,
+    label: `Vidéo opération WHTL ${String(index + 1).padStart(2, "0")}`,
+  })),
 ];
 
 function pathToPage(pathname: string): NavPage {
@@ -630,6 +684,7 @@ function HomePage({ navigate }: { navigate: (path: string) => void }) {
       <PartnersBlock />
       <TalkToUsBlock navigate={navigate} />
       <UsedEquipmentBlock navigate={navigate} />
+      <MediaGallery />
       <CasesPreview navigate={navigate} />
       <TransitionBlock navigate={navigate} />
     </>
@@ -709,8 +764,8 @@ function EquipmentPreview({ navigate }: { navigate: (path: string) => void }) {
         </LinkButton>
       </div>
       <img
-        src="https://commons.wikimedia.org/wiki/Special:FilePath/SCHEUERLE_SPMTs_moving_a_ship_section.jpg?width=1800"
-        alt="SPMT transportant une section de navire"
+        src={mediaPath("received_1386292979996984.jpeg")}
+        alt="Transformateur transporté sur une remorque modulaire WHTL"
       />
     </section>
   );
@@ -870,6 +925,58 @@ function UsedEquipmentBlock({ navigate }: { navigate: (path: string) => void }) 
   );
 }
 
+function MediaGallery() {
+  const railRef = useRef<HTMLDivElement>(null);
+
+  const scrollRail = (direction: -1 | 1) => {
+    railRef.current?.scrollBy({
+      left: direction * Math.min(window.innerWidth * 0.82, 980),
+      behavior: "smooth",
+    });
+  };
+
+  return (
+    <section className="media-library">
+      <div className="media-library__heading">
+        <div>
+          <p className="section-kicker">WHTL sur le terrain</p>
+          <h2>Photos et vidéos de nos opérations.</h2>
+        </div>
+        <div className="media-controls" aria-label="Contrôles de la galerie">
+          <button onClick={() => scrollRail(-1)} aria-label="Voir les médias précédents">
+            <ChevronLeft size={24} />
+          </button>
+          <button onClick={() => scrollRail(1)} aria-label="Voir les médias suivants">
+            <ChevronRight size={24} />
+          </button>
+        </div>
+      </div>
+      <div className="media-rail" ref={railRef}>
+        {mediaLibrary.map((item, index) => (
+          <figure className="media-slide" key={item.src}>
+            {item.type === "video" ? (
+              <video
+                controls
+                playsInline
+                preload="metadata"
+                poster={mediaPath("received_1386292979996984.jpeg")}
+              >
+                <source src={item.src} type="video/mp4" />
+              </video>
+            ) : (
+              <img src={item.src} alt={item.label} loading={index > 3 ? "lazy" : "eager"} />
+            )}
+            <figcaption>
+              <span>{item.type === "video" ? "Vidéo" : "Photo"}</span>
+              <strong>{item.label}</strong>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function CasesPreview({ navigate }: { navigate: (path: string) => void }) {
   return (
     <section className="projects">
@@ -919,7 +1026,7 @@ function SolutionsPage({ navigate }: { navigate: (path: string) => void }) {
         kicker="Solutions"
         title="Logistique de projet intégrée"
         body="WHTL coordonne les études, les autorisations, le transport, les opérations portuaires et l'exécution sur site."
-        image="https://images.unsplash.com/photo-1513828583688-c52646db42da?auto=format&fit=crop&w=2200&q=90"
+        image={mediaPath("received_1386292979996984.jpeg")}
       />
       <section className="listing-section">
         <div className="sector-card-grid">
@@ -1012,7 +1119,7 @@ function EquipmentPage({ navigate }: { navigate: (path: string) => void }) {
         kicker="Equipements"
         title="Flotte et équipements"
         body="Une flotte spécialisée pour le transport exceptionnel, la manutention lourde et le montage industriel."
-        image="https://commons.wikimedia.org/wiki/Special:FilePath/SCHEUERLE_SPMTs_moving_a_ship_section.jpg?width=2200"
+        image={mediaPath("received_1003047622117156.jpeg")}
       />
       <section className="listing-section">
         <div className="filter-row">
@@ -1103,7 +1210,7 @@ function CaseStudiesPage({ navigate }: { navigate: (path: string) => void }) {
         kicker="Etudes de cas"
         title="References projet"
         body="Cartes detaillees avec grande image, secteur, probleme, methode et appel contact."
-        image="https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=2200&q=90"
+        image={mediaPath("Messenger_creation_1937362816978940.jpeg")}
       />
       <section className="listing-section">
         <div className="case-grid case-grid--large">
@@ -1134,7 +1241,7 @@ function ResourcesPage({ navigate }: { navigate: (path: string) => void }) {
         kicker="Ressources"
         title="Expertise et méthodes"
         body="Notes techniques sur le transport exceptionnel, la consignation maritime et l'ingénierie Heavy Lift."
-        image="https://images.unsplash.com/photo-1581092335878-2d9ff86ca2bf?auto=format&fit=crop&w=2200&q=90"
+        image={mediaPath("received_1444943581007746.jpeg")}
       />
       <section className="listing-section">
         <div className="resource-toolbar">
@@ -1168,7 +1275,7 @@ function AboutPage({ navigate }: { navigate: (path: string) => void }) {
         kicker="A propos"
         title="Un groupe logistique ancré sur le terrain."
         body="WHTL accompagne les projets industriels complexes grâce à ses équipes, ses filiales et son réseau de partenaires."
-        image="https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?auto=format&fit=crop&w=2200&q=90"
+        image={mediaPath("received_1371596501494574.jpeg")}
       />
       <ServiceGrid navigate={navigate} />
       <PartnersBlock />
@@ -1193,7 +1300,7 @@ function ContactPage() {
         kicker="Contact"
         title="Parlons de votre prochain projet."
         body="Décrivez votre cargaison, votre escale, votre itinéraire ou votre besoin de transport et de manutention."
-        image="https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=2200&q=90"
+        image={mediaPath("received_1478619903572628.jpeg")}
       />
       <section className="contact-page">
         <form>
