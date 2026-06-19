@@ -1,6 +1,6 @@
-# Mamiabat
+# WHTL
 
-Site React/Vite pour Mamiabat: levage lourd, transport exceptionnel, equipements et services industriels.
+Site React/Vite pour WHTL: freight forwarding, consignation maritime, transport exceptionnel, Heavy Lift et services industriels.
 
 ## Developpement
 

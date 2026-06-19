@@ -12,7 +12,6 @@ import {
   Ship,
   TowerControl,
   Truck,
-  Wind,
   X,
   Zap,
 } from "lucide-react";
@@ -29,7 +28,7 @@ type NavPage =
   | "service"
   | "equipment-detail";
 
-type SectorKey = "energy" | "renewables" | "infrastructure" | "power";
+type SectorKey = "energy" | "maritime" | "infrastructure" | "industry";
 
 type Sector = {
   key: SectorKey;
@@ -64,210 +63,251 @@ type Equipment = {
 const sectors: Sector[] = [
   {
     key: "energy",
-    label: "Energie",
-    eyebrow: "Modules, raffineries, terminaux",
+    label: "Énergie",
+    eyebrow: "Transformateurs, centrales, réseaux",
     icon: Factory,
     image:
       "https://images.unsplash.com/photo-1513828583688-c52646db42da?auto=format&fit=crop&w=1600&q=85",
-    links: ["Construction de sites LNG", "Arrets de raffinerie", "Montage raffinerie"],
+    links: ["Transport de transformateurs", "Montage industriel", "Livraison sur site"],
     summary:
-      "Planification, levage et transport de composants critiques pour sites energetiques complexes.",
+      "Transport, levage et installation d'équipements lourds pour les projets énergétiques.",
   },
   {
-    key: "renewables",
-    label: "Renouvelables",
-    eyebrow: "Eolien, solaire, hybride",
-    icon: Wind,
+    key: "maritime",
+    label: "Maritime & ports",
+    eyebrow: "Navires, Ro-Ro, breakbulk",
+    icon: Ship,
     image:
       "https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=1600&q=85",
-    links: ["Transport de pales", "Installation turbines", "Pre-assemblage portuaire"],
+    links: ["Consignation des navires", "Opérations portuaires", "Fret Heavy Lift"],
     summary:
-      "Des itineraires et methodes de montage pour accelerer les projets bas carbone.",
+      "Organisation des escales, coordination portuaire et suivi des cargaisons conventionnelles ou hors gabarit.",
   },
   {
     key: "infrastructure",
     label: "Infrastructure",
-    eyebrow: "Ponts, ports, grands ouvrages",
-    icon: Ship,
+    eyebrow: "Routes, ouvrages, plateformes",
+    icon: TowerControl,
     image:
       "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=1600&q=85",
-    links: ["Pose de ponts", "Relocalisation grues portuaires", "Transport tunnelier"],
+    links: ["Route survey", "Aménagement routier", "Renforcement d'ouvrages"],
     summary:
-      "Des solutions sur mesure pour deplacer, lever et installer des ouvrages hors norme.",
+      "Préparation et sécurisation des itinéraires nécessaires au passage des convois exceptionnels.",
   },
   {
-    key: "power",
-    label: "Electricite",
-    eyebrow: "Reseau, nucleaire, turbines",
+    key: "industry",
+    label: "Industrie",
+    eyebrow: "Usines, équipements, projets complexes",
     icon: Zap,
     image:
       "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1600&q=85",
-    links: ["Transformateurs", "Generateurs", "Remplacement composants nucleaires"],
+    links: ["Manutention lourde", "Skidding", "Coordination de projet"],
     summary:
-      "Operations haute precision pour maintenir les infrastructures electriques en service.",
+      "Des méthodes complètes, de l'étude technique à l'installation finale sur site.",
   },
 ];
 
 const services: Service[] = [
   {
-    slug: "heavy-lifting",
-    title: "Levage lourd",
-    kicker: "Levage lourd",
+    slug: "freight-forwarding",
+    title: "Freight Forwarding",
+    kicker: "Transport multimodal",
     image:
       "https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=1600&q=85",
     hero:
       "https://images.unsplash.com/photo-1565793298595-6a879b1d9492?auto=format&fit=crop&w=2200&q=90",
     intro:
-      "Etudes de levage, grues grande capacite, portiques, strand jacks et sequences synchronisees pour pieces critiques.",
-    bullets: ["Etude de charge", "Plans de levage", "Execution chantier", "Supervision HSE"],
-    equipment: ["Grues treillis", "Portiques hydrauliques", "Strand jacks", "Systemes de pesage"],
+      "Organisation du transport maritime, terrestre et multimodal, avec coordination logistique, douanière et suivi opérationnel des cargaisons.",
+    bullets: ["Étude logistique", "Transport multimodal", "Coordination douanière", "Suivi des cargaisons"],
+    equipment: ["Conteneurs", "Remorques conventionnelles", "Porte-chars", "Solutions Ro-Ro"],
   },
   {
-    slug: "heavy-transport",
-    title: "Transport lourd",
-    kicker: "Transport lourd",
+    slug: "ship-agency",
+    title: "Consignation maritime",
+    kicker: "Ship Agency Services",
     image:
       "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=85",
     hero:
       "https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&w=2200&q=90",
     intro:
-      "SPMT, remorques conventionnelles, etudes d'itineraire et coordination route/port pour charges indivisibles.",
-    bullets: ["Route survey", "SPMT", "Transport multimodal", "Permis et escortes"],
-    equipment: ["SPMT", "Remorques modulaires", "Tracteurs lourds", "Barges"],
+      "Gestion des opérations portuaires, consignation des navires et coordination de tous les intervenants pendant l'escale.",
+    bullets: ["Préparation d'escale", "Consignation navire", "Coordination portuaire", "Suivi documentaire"],
+    equipment: ["Navires Ro-Ro", "Navires breakbulk", "Moyens portuaires", "Zones de stockage"],
   },
   {
-    slug: "crane-rental",
-    title: "Location de grues",
-    kicker: "Location de grues",
+    slug: "special-transport",
+    title: "Transport spécial",
+    kicker: "Heavy Transport Engineering",
     image:
       "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1600&q=85",
     hero:
       "https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=2200&q=90",
     intro:
-      "Flotte de grues mobiles et chenille avec operateurs, riggers, accessoires et planning court ou long terme.",
-    bullets: ["Grues mobiles", "Grues chenille", "Riggers certifies", "Maintenance flotte"],
-    equipment: ["Grues mobiles", "Grues chenille", "Nacelles", "Accessoires levage"],
+      "Études de transport, route survey, autorisations, aménagement des itinéraires et supervision complète des convois exceptionnels.",
+    bullets: ["Route survey", "Calculs de stabilité", "Autorisations de circulation", "Escorte technique"],
+    equipment: ["40 lignes THP/SL", "Remorques extensibles", "Tracteurs Heavy Haul", "Plaque tournante 250 T"],
   },
   {
-    slug: "industrial-solutions",
-    title: "Solutions industrielles",
-    kicker: "Solutions industrielles",
+    slug: "heavy-lift",
+    title: "Heavy Lift & industrie",
+    kicker: "Levage et manutention lourde",
     image:
       "https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?auto=format&fit=crop&w=1600&q=85",
     hero:
       "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=2200&q=90",
     intro:
-      "Methodes d'installation, skidding, jacking, maintenance d'arret et remplacement de composants dans espaces contraints.",
-    bullets: ["Skidding", "Jacking", "Maintenance arret", "Installation en espace confine"],
-    equipment: ["Systemes de ripage", "Tours de levage", "Groupes hydrauliques", "Outillage special"],
+      "Levage, manutention lourde, montage d'équipements industriels et transformateurs, skidding et distribution jusqu'au site final.",
+    bullets: ["Plans de levage", "Montage industriel", "Skidding", "Livraison sur site"],
+    equipment: ["Portiques SBL 1100 T et 1000 T", "Skidding 400 T", "Vérins 20 T à 100 T", "Quais marteaux"],
   },
 ];
 
 const equipment: Equipment[] = [
   {
-    slug: "crawler-cranes",
-    title: "Grues chenille",
-    category: "Levage",
+    slug: "thp-sl",
+    title: "Remorques THP/SL",
+    category: "Transport",
     image: "https://commons.wikimedia.org/wiki/Special:FilePath/Crawler_crane_2.jpg?width=1600",
-    capacity: "Jusqu'a 3 000 t",
-    body: "Pour levage lourd, montage industriel, ports, energie et grands chantiers.",
+    capacity: "40 lignes · 45 T par ligne",
+    body: "Remorques modulaires hydrauliques configurables pour les colis lourds et hors gabarit.",
   },
   {
-    slug: "mobile-cranes",
-    title: "Grues mobiles",
-    category: "Levage",
+    slug: "extendable-trailers",
+    title: "Remorques extensibles",
+    category: "Transport",
     image: "https://commons.wikimedia.org/wiki/Special:FilePath/Mobile_Cranes.jpg?width=1600",
-    capacity: "80 t a 750 t",
-    body: "Mobilisation rapide, interventions urbaines, maintenance industrielle et levages planifies.",
+    capacity: "8 unités · 60 à 90 T · jusqu'à 34 m",
+    body: "Remorques extra surbaissées pour les pièces longues, industrielles et exceptionnelles.",
   },
   {
-    slug: "spmt",
-    title: "SPMT",
+    slug: "tramway-trailers",
+    title: "Remorques tramway",
     category: "Transport",
     image:
       "https://commons.wikimedia.org/wiki/Special:FilePath/SCHEUERLE_SPMTs_moving_a_ship_section.jpg?width=1600",
-    capacity: "Modules multi-lignes",
-    body: "Transport autopropulse avec pilotage precis pour charges indivisibles.",
+    capacity: "2 semi-remorques hydrauliques",
+    body: "Équipements spécialisés dédiés au transport sécurisé de tramways.",
   },
   {
-    slug: "modular-trailers",
-    title: "Remorques modulaires",
+    slug: "conventional-trailers",
+    title: "Semi-remorques conventionnelles",
     category: "Transport",
     image:
       "https://commons.wikimedia.org/wiki/Special:FilePath/Seitentr%C3%A4gerbr%C3%BCcke_STB_1000.jpg?width=1600",
-    capacity: "Compositions sur mesure",
-    body: "Configurations routieres pour transformateurs, turbines, vessels et elements prefabriques.",
+    capacity: "5 porte-chars 54 T · 5 plateaux 30 T",
+    body: "Une flotte conventionnelle pour le transport industriel et la distribution sur site.",
   },
   {
-    slug: "strand-jacks",
-    title: "Strand jacks",
-    category: "Special",
+    slug: "transport-accessories",
+    title: "Accessoires techniques",
+    category: "Ingénierie",
     image:
       "https://commons.wikimedia.org/wiki/Special:FilePath/Haseltalbr%C3%BCcke-Litzenheber.jpg?width=1600",
-    capacity: "Levage synchronise",
-    body: "Systemes de traction pour load-outs, ponts, modules et operations verticales.",
+    capacity: "Plaque tournante 250 T",
+    body: "Plateau visselle de 9 m, plateaux de 3 m et 6 m, et splites pour configurations à 3 files.",
   },
   {
-    slug: "jacking-skidding",
-    title: "Jacking & skidding",
-    category: "Special",
+    slug: "skidding",
+    title: "Skidding & manutention",
+    category: "Manutention",
     image:
       "https://commons.wikimedia.org/wiki/Special:FilePath/Freybr%C3%BCcke_Berlin-Spandau-Juni_2016-26-DSCF0158.jpg?width=1600",
-    capacity: "Installation millimetrique",
-    body: "Ripage, levage par etapes et positionnement de composants dans espaces limites.",
+    capacity: "Skidding 400 T · turntable 100 T",
+    body: "20 quais marteaux avec poutres et pieds d'éléphant, jusqu'à 100 T par kit.",
   },
   {
-    slug: "gantries",
-    title: "Portiques hydrauliques",
+    slug: "sbl-gantries",
+    title: "Portiques SBL",
     category: "Levage",
     image: "https://commons.wikimedia.org/wiki/Special:FilePath/TAISUN_with_SCARABEO_9.JPG?width=1600",
-    capacity: "Fortes charges en hall",
-    body: "Alternative aux grues pour installation interieure, usines et maintenance lourde.",
+    capacity: "SBL 1100 T et SBL 1000 T",
+    body: "Portiques disponibles en partenariat avec SBL pour les opérations industrielles lourdes.",
   },
   {
-    slug: "barges",
-    title: "Barges et load-out",
-    category: "Maritime",
+    slug: "hydraulic-equipment",
+    title: "Équipements hydrauliques",
+    category: "Levage",
     image: "https://commons.wikimedia.org/wiki/Special:FilePath/Lima_crane_TOMH_on_pontoon,_pic4.JPG?width=1600",
-    capacity: "Transport fluvial et portuaire",
-    body: "Solutions maritimes pour modules, turbines, grues portuaires et structures acier.",
+    capacity: "2 centrales 700 bars · vérins 20 à 100 T",
+    body: "Centrales hydrauliques à vérins et vérins double effet pour levage et positionnement contrôlés.",
+  },
+  {
+    slug: "heavy-haul-tractors",
+    title: "Tracteurs Heavy Haul",
+    category: "Tracteurs",
+    image:
+      "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=85",
+    capacity: "10 tracteurs · jusqu'à 250 PTRA",
+    body: "Astra 8x6 et 6x4, Scania 6x4 et Volvo 6x4 pour les convois exceptionnels.",
   },
 ];
 
 const cases = [
   {
-    title: "Pont metallique installe en une nuit",
-    sector: "Infrastructure",
+    title: "Transport exceptionnel de transformateur",
+    sector: "Énergie",
     image:
       "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=1600&q=85",
   },
   {
-    title: "Transformateur 420 t livre en zone contrainte",
-    sector: "Electricite",
+    title: "Coordination portuaire d'un colis hors gabarit",
+    sector: "Maritime",
     image:
       "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1600&q=85",
   },
   {
-    title: "Pre-assemblage eolien offshore",
-    sector: "Renouvelables",
+    title: "Préparation d'itinéraire pour convoi exceptionnel",
+    sector: "Infrastructure",
     image:
       "https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=1600&q=85",
   },
   {
-    title: "Module industriel de 2 900 t deplace par SPMT",
-    sector: "Energie",
+    title: "Montage et manutention d'un équipement industriel",
+    sector: "Industrie",
     image:
       "https://images.unsplash.com/photo-1513828583688-c52646db42da?auto=format&fit=crop&w=1600&q=85",
   },
 ];
 
 const resources = [
-  "Pourquoi le route survey decide la reussite du transport lourd",
-  "Zero emission lifting: preparer les chantiers bas carbone",
-  "Espaces confines: installer lourd sans arreter l'usine",
-  "Load-out maritime: les points qui changent tout",
-  "Skidding: garder les projets sur rails",
-  "Comment choisir entre portique, grue et strand jack",
+  "Pourquoi le route survey décide la réussite d'un transport exceptionnel",
+  "Préparer les autorisations et arrêtés de circulation",
+  "Calculs de stabilité et conception des lashing plans",
+  "Coordination portuaire des navires Ro-Ro et breakbulk",
+  "Skidding: déplacer une charge industrielle en sécurité",
+  "Coordonner Sonelgaz, chemins de fer, APC, hydraulique et télécommunications",
+];
+
+const partners = [
+  {
+    title: "WHTL Service",
+    label: "Filiale opérationnelle",
+    body: "Transport conventionnel et exceptionnel, levage, manutention lourde, montage industriel, stockage et livraison sur site.",
+  },
+  {
+    title: "Mamiabat",
+    label: "Filiale technique",
+    body: "Aménagement routier, renforcement des routes et ouvrages, études techniques et préparation des itinéraires.",
+  },
+  {
+    title: "Partenaire maritime",
+    label: "Heavy Lift & Ro-Ro",
+    body: "Fret maritime de colis exceptionnels, navires Ro-Ro et breakbulk, avec coordination portuaire des projets industriels.",
+  },
+  {
+    title: "CMN",
+    label: "Transit & fret",
+    body: "Fret conventionnel, conteneurs, transit local et international, formalités douanières et coordination import-export.",
+  },
+];
+
+const authorities = [
+  "Sonelgaz",
+  "Chemins de fer",
+  "APC",
+  "Hydraulique",
+  "PTT / Télécommunications",
+  "Autorités locales et administratives",
 ];
 
 function pathToPage(pathname: string): NavPage {
@@ -396,8 +436,8 @@ function Header({
   return (
     <header className={`topbar ${solid ? "topbar--solid" : ""}`}>
       <LinkButton className="brand" to="/" navigate={navigate}>
-        <span className="brand-mark">M</span>
-        <span className="brand-name">Mamiabat</span>
+        <span className="brand-mark">W</span>
+        <span className="brand-name">WHTL</span>
       </LinkButton>
 
       <nav className="desktop-nav" aria-label="Navigation principale">
@@ -510,11 +550,11 @@ function HomePage({ navigate }: { navigate: (path: string) => void }) {
         <div className="hero-media" />
         <div className="hero-scrim" />
         <div className="hero-content">
-          <p className="hero-kicker">Solutions de levage et transport hors norme</p>
-          <h1>Ingenierie pour les charges que personne ne deplace seul.</h1>
+          <p className="hero-kicker">Freight Forwarding & Ship Agency Services</p>
+          <h1>La logistique des projets les plus complexes.</h1>
           <p className="hero-copy">
-            Mamiabat planifie, transporte et installe les composants les plus lourds des projets
-            energie, infrastructure et industrie.
+            WHTL gère vos opérations logistiques, portuaires et de transport exceptionnel en
+            Algérie, depuis l'étude technique jusqu'à la réalisation sur le terrain.
           </p>
           <div className="hero-actions">
             <LinkButton className="primary-action" to="/how-we-help" navigate={navigate}>
@@ -529,16 +569,16 @@ function HomePage({ navigate }: { navigate: (path: string) => void }) {
         </div>
         <div className="hero-metrics">
           <span>
-            <strong>42</strong>
-            pays actifs
+            <strong>40</strong>
+            lignes THP/SL
           </span>
           <span>
-            <strong>900+</strong>
-            operations/an
+            <strong>45 T</strong>
+            par ligne d'essieux
           </span>
           <span>
-            <strong>24/7</strong>
-            cellule projet
+            <strong>400 T</strong>
+            système de skidding
           </span>
         </div>
         <a className="scroll-cue" href="#sectors">
@@ -547,7 +587,7 @@ function HomePage({ navigate }: { navigate: (path: string) => void }) {
       </section>
 
       <section className="sector-band" id="sectors">
-        <SectionTitle kicker="Choisir votre secteur" title="Voir comment on intervient par domaine." />
+        <SectionTitle kicker="Nos domaines" title="Une expertise coordonnée sur terre, au port et sur site." />
         <div className="sector-layout">
           <div className="sector-tabs">
             {sectors.map((sector) => {
@@ -585,6 +625,9 @@ function HomePage({ navigate }: { navigate: (path: string) => void }) {
 
       <ServiceGrid navigate={navigate} />
       <EquipmentPreview navigate={navigate} />
+      <FleetFactsBlock navigate={navigate} />
+      <AuthoritiesBlock />
+      <PartnersBlock />
       <TalkToUsBlock navigate={navigate} />
       <UsedEquipmentBlock navigate={navigate} />
       <CasesPreview navigate={navigate} />
@@ -629,7 +672,7 @@ function SectionTitle({ kicker, title }: { kicker: string; title: string }) {
 function ServiceGrid({ navigate }: { navigate: (path: string) => void }) {
   return (
     <section className="services">
-      <SectionTitle kicker="Services principaux" title="Chaque service a sa page et son image." />
+      <SectionTitle kicker="Services principaux" title="De l'organisation logistique à l'exécution terrain." />
       <div className="service-grid image-grid">
         {services.map((service) => (
           <article className="service-card image-card" key={service.slug}>
@@ -655,10 +698,10 @@ function EquipmentPreview({ navigate }: { navigate: (path: string) => void }) {
     <section className="split-showcase">
       <div>
         <p className="section-kicker">Equipements</p>
-        <h2>Une flotte pour lever, transporter, ripper et installer.</h2>
+        <h2>Une flotte dédiée au Heavy Transport & Heavy Lifting.</h2>
         <p>
-          Grues, SPMT, remorques modulaires, strand jacks, barges et systemes speciaux presentes
-          dans une page dediee.
+          Remorques THP/SL, tracteurs Heavy Haul, portiques SBL, vérins hydrauliques et systèmes
+          de skidding pour les opérations les plus complexes.
         </p>
         <LinkButton className="primary-action" to="/equipment" navigate={navigate}>
           Voir les equipements
@@ -669,6 +712,80 @@ function EquipmentPreview({ navigate }: { navigate: (path: string) => void }) {
         src="https://commons.wikimedia.org/wiki/Special:FilePath/SCHEUERLE_SPMTs_moving_a_ship_section.jpg?width=1800"
         alt="SPMT transportant une section de navire"
       />
+    </section>
+  );
+}
+
+function FleetFactsBlock({ navigate }: { navigate: (path: string) => void }) {
+  const facts = [
+    { value: "40", label: "lignes modulaires THP/SL", detail: "45 tonnes par ligne d'essieux" },
+    { value: "8", label: "remorques extensibles", detail: "60 à 90 T, extension jusqu'à 34 m" },
+    { value: "400 T", label: "système de skidding", detail: "avec turntable de 100 T" },
+    { value: "1100 T", label: "portique SBL", detail: "complété par un portique SBL 1000 T" },
+  ];
+
+  return (
+    <section className="fleet-facts">
+      <div className="fleet-facts__heading">
+        <p className="section-kicker">Capacités opérationnelles</p>
+        <h2>Des moyens dimensionnés pour les projets hors norme.</h2>
+        <LinkButton className="text-action" to="/equipment" navigate={navigate}>
+          Découvrir toute la flotte
+          <ArrowRight size={18} />
+        </LinkButton>
+      </div>
+      <div className="fleet-facts__grid">
+        {facts.map((fact) => (
+          <article key={fact.label}>
+            <strong>{fact.value}</strong>
+            <h3>{fact.label}</h3>
+            <p>{fact.detail}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function AuthoritiesBlock() {
+  return (
+    <section className="authorities-block">
+      <div className="authorities-copy">
+        <p className="section-kicker">Coordination institutionnelle</p>
+        <h2>Un seul pilote pour tous les intervenants.</h2>
+        <p>
+          WHTL assure les démarches, autorisations et coordinations nécessaires au passage des
+          convois exceptionnels et à la réalisation des opérations sur le terrain.
+        </p>
+      </div>
+      <div className="authority-list">
+        {authorities.map((authority, index) => (
+          <div key={authority}>
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <strong>{authority}</strong>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PartnersBlock() {
+  return (
+    <section className="partners-block">
+      <SectionTitle
+        kicker="Filiales & partenaires"
+        title="Des compétences complémentaires réunies autour de chaque projet."
+      />
+      <div className="partner-grid">
+        {partners.map((partner) => (
+          <article className="partner-card" key={partner.title}>
+            <span>{partner.label}</span>
+            <h2>{partner.title}</h2>
+            <p>{partner.body}</p>
+          </article>
+        ))}
+      </div>
     </section>
   );
 }
@@ -691,8 +808,8 @@ function TalkToUsBlock({ navigate }: { navigate: (path: string) => void }) {
       to: "/about",
     },
     {
-      title: "Carrieres chez Mamiabat",
-      body: "Operateurs, riggers, ingenieurs methodes et supervision terrain.",
+      title: "Travailler avec WHTL",
+      body: "Opérations, ingénierie, coordination portuaire et supervision terrain.",
       to: "/about",
     },
   ];
@@ -729,15 +846,15 @@ function UsedEquipmentBlock({ navigate }: { navigate: (path: string) => void }) 
   return (
     <section className="used-equipment">
       <div className="used-copy">
-        <p className="section-kicker">Materiel disponible</p>
-        <h2>Vous cherchez des equipements d'occasion ?</h2>
+        <p className="section-kicker">Notre flotte</p>
+        <h2>Vous cherchez une solution de transport ou de levage ?</h2>
         <p>
-          Grues, remorques, SPMT et accessoires de levage avec fiches techniques, photos et
-          disponibilites clairement presentees.
+          Notre groupe mobilise des remorques modulaires, des tracteurs Heavy Haul, des portiques,
+          des vérins et des accessoires spécialisés.
         </p>
         <p>
-          Chaque equipement peut etre qualifie avec capacite, configuration, historique de
-          maintenance et conditions de mobilisation.
+          Chaque configuration est étudiée selon la charge, l'itinéraire, les contraintes
+          portuaires et les conditions d'installation sur site.
         </p>
         <LinkButton className="primary-action" to="/equipment" navigate={navigate}>
           Voir les equipements
@@ -800,8 +917,8 @@ function SolutionsPage({ navigate }: { navigate: (path: string) => void }) {
     <>
       <PageHero
         kicker="Solutions"
-        title="Solutions par secteur"
-        body="Une structure de navigation proche du modele: industries, applications, services, puis contact projet."
+        title="Logistique de projet intégrée"
+        body="WHTL coordonne les études, les autorisations, le transport, les opérations portuaires et l'exécution sur site."
         image="https://images.unsplash.com/photo-1513828583688-c52646db42da?auto=format&fit=crop&w=2200&q=90"
       />
       <section className="listing-section">
@@ -861,7 +978,7 @@ function ServicePage({
           ))}
         </aside>
         <article className="detail-body">
-          <h2>De l'ingenierie a l'execution</h2>
+          <h2>De l'ingénierie à l'exécution</h2>
           <p>{service.intro}</p>
           <div className="process-grid">
             {service.bullets.map((bullet, index) => (
@@ -871,7 +988,7 @@ function ServicePage({
               </div>
             ))}
           </div>
-          <h3>Equipements utilises</h3>
+          <h3>Équipements et moyens mobilisés</h3>
           <div className="tag-grid">
             {service.equipment.map((item) => (
               <span key={item}>{item}</span>
@@ -893,8 +1010,8 @@ function EquipmentPage({ navigate }: { navigate: (path: string) => void }) {
     <>
       <PageHero
         kicker="Equipements"
-        title="Flotte et equipements"
-        body="Les memes grandes familles d'equipements lourds: grues, SPMT, remorques, portiques, strand jacks, skidding et solutions maritimes."
+        title="Flotte et équipements"
+        body="Une flotte spécialisée pour le transport exceptionnel, la manutention lourde et le montage industriel."
         image="https://commons.wikimedia.org/wiki/Special:FilePath/SCHEUERLE_SPMTs_moving_a_ship_section.jpg?width=2200"
       />
       <section className="listing-section">
@@ -996,7 +1113,7 @@ function CaseStudiesPage({ navigate }: { navigate: (path: string) => void }) {
               <div>
                 <span>{item.sector}</span>
                 <h3>{item.title}</h3>
-                <p>Etude, preparation, equipements, execution et retour operationnel.</p>
+                <p>Étude, préparation, autorisations, mobilisation des équipements et supervision opérationnelle.</p>
                 <LinkButton to="/contact" navigate={navigate}>
                   Demander une methode similaire
                   <ArrowRight size={16} />
@@ -1015,8 +1132,8 @@ function ResourcesPage({ navigate }: { navigate: (path: string) => void }) {
     <>
       <PageHero
         kicker="Ressources"
-        title="Insights et innovations"
-        body="Une page ressources avec articles, videos et points d'expertise comme la reference, mais contenu original."
+        title="Expertise et méthodes"
+        body="Notes techniques sur le transport exceptionnel, la consignation maritime et l'ingénierie Heavy Lift."
         image="https://images.unsplash.com/photo-1581092335878-2d9ff86ca2bf?auto=format&fit=crop&w=2200&q=90"
       />
       <section className="listing-section">
@@ -1049,17 +1166,19 @@ function AboutPage({ navigate }: { navigate: (path: string) => void }) {
     <>
       <PageHero
         kicker="A propos"
-        title="Une equipe orientee securite, methode et execution."
-        body="Page groupe avec services coeur, securite, environnement, conformite et liens rapides."
+        title="Un groupe logistique ancré sur le terrain."
+        body="WHTL accompagne les projets industriels complexes grâce à ses équipes, ses filiales et son réseau de partenaires."
         image="https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?auto=format&fit=crop&w=2200&q=90"
       />
       <ServiceGrid navigate={navigate} />
+      <PartnersBlock />
+      <AuthoritiesBlock />
       <section className="values-band">
-        {["Safety first", "Environment", "Ethics & compliance"].map((item) => (
+        {["Fiabilité", "Sécurité", "Coordination"].map((item) => (
           <article key={item}>
             <ShieldCheck size={28} />
             <h2>{item}</h2>
-            <p>Procedures, controle terrain, transparence client et documentation projet.</p>
+            <p>Expertise terrain, préparation technique, transparence client et maîtrise opérationnelle.</p>
           </article>
         ))}
       </section>
@@ -1072,8 +1191,8 @@ function ContactPage() {
     <>
       <PageHero
         kicker="Contact"
-        title="Parlons de ton prochain levage."
-        body="Un formulaire visuel pour qualifier charge, dimensions, site, delai et besoin d'equipements."
+        title="Parlons de votre prochain projet."
+        body="Décrivez votre cargaison, votre escale, votre itinéraire ou votre besoin de transport et de manutention."
         image="https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=2200&q=90"
       />
       <section className="contact-page">
@@ -1104,9 +1223,9 @@ function ContactPage() {
           </button>
         </form>
         <div className="contact-panel">
-          <p className="section-kicker">Cellule projet 24/7</p>
-          <h2>contact@mamiabat.com</h2>
-          <span>Alger · Marseille · Rotterdam</span>
+          <p className="section-kicker">Votre partenaire logistique</p>
+          <h2>Équipe projet WHTL</h2>
+          <span>Coordination en Algérie · Projets nationaux et internationaux</span>
         </div>
       </section>
     </>
@@ -1117,9 +1236,9 @@ function Footer({ navigate }: { navigate: (path: string) => void }) {
   return (
     <footer className="footer">
       <div className="footer-brand">
-        <span className="brand-mark">M</span>
-        <strong>Mamiabat</strong>
-        <p>Levage lourd, transport exceptionnel, execution industrielle.</p>
+        <span className="brand-mark">W</span>
+        <strong>WHTL</strong>
+        <p>Freight forwarding, consignation maritime, transport exceptionnel et Heavy Lift.</p>
       </div>
       <div className="footer-columns">
         <div>
@@ -1143,7 +1262,7 @@ function Footer({ navigate }: { navigate: (path: string) => void }) {
           ))}
         </div>
         <div>
-          <h3>Company</h3>
+          <h3>Groupe</h3>
           <LinkButton to="/about" navigate={navigate}>
             A propos
           </LinkButton>
@@ -1156,7 +1275,7 @@ function Footer({ navigate }: { navigate: (path: string) => void }) {
         </div>
       </div>
       <div className="footer-bottom">
-        <span>© 2026 Mamiabat</span>
+        <span>© 2026 WHTL</span>
         <span>
           <Globe2 size={15} />
           FR
