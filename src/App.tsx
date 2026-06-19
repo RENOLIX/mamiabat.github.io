@@ -439,6 +439,13 @@ function App() {
   const serviceSlug = pathname.split("/services/")[1];
   const equipmentSlug = pathname.split("/equipment/")[1];
 
+  useEffect(() => {
+    const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (canonical) {
+      canonical.href = `https://whtl-dz.com${pathname === "/" ? "/" : pathname}`;
+    }
+  }, [pathname]);
+
   return (
     <div className="site-shell">
       <Header

@@ -1,4 +1,4 @@
-name: Deploy Mamiabat
+name: Deploy WHTL
 
 on:
   push:
@@ -28,6 +28,8 @@ jobs:
         run: npm install
       - name: Build
         run: npm run build
+      - name: Add SPA fallback
+        run: cp dist/index.html dist/404.html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
