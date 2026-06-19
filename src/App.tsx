@@ -4,7 +4,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Factory,
-  Globe2,
   Mail,
   Menu,
   MoveRight,
@@ -1383,10 +1382,7 @@ function Footer({ navigate }: { navigate: (path: string) => void }) {
       </div>
       <div className="footer-bottom">
         <span>© 2026 WHTL</span>
-        <span>
-          <Globe2 size={15} />
-          FR
-        </span>
+        <span>Developed by SITEMAGIQUE</span>
       </div>
     </footer>
   );
