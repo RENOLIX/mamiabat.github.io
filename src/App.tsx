@@ -3,10 +3,13 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Clock3,
   Factory,
   Mail,
   Menu,
+  MessageCircle,
   MoveRight,
+  Phone,
   Play,
   Search,
   ShieldCheck,
@@ -1300,6 +1303,40 @@ function AboutPage({ navigate }: { navigate: (path: string) => void }) {
 }
 
 function ContactPage() {
+  const sendToWhatsApp = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const name = String(form.get("name") ?? "").trim();
+    const company = String(form.get("company") ?? "").trim();
+    const phone = String(form.get("phone") ?? "").trim();
+    const email = String(form.get("email") ?? "").trim();
+    const service = String(form.get("service") ?? "").trim();
+    const message = String(form.get("message") ?? "").trim();
+
+    const whatsappMessage = [
+      "Bonjour WHTL,",
+      "",
+      "Je souhaite vous adresser une demande concernant un projet logistique.",
+      "",
+      `Nom : ${name}`,
+      `Entreprise : ${company || "Non renseignée"}`,
+      `Téléphone : ${phone}`,
+      `E-mail : ${email}`,
+      `Service demandé : ${service}`,
+      "",
+      "Description du besoin :",
+      message,
+      "",
+      "Merci de me recontacter afin d'étudier cette demande.",
+    ].join("\n");
+
+    window.open(
+      `https://wa.me/213560117109?text=${encodeURIComponent(whatsappMessage)}`,
+      "_blank",
+      "noopener,noreferrer",
+    );
+  };
+
   return (
     <>
       <PageHero
@@ -1309,36 +1346,82 @@ function ContactPage() {
         image={mediaPath("received_1478619903572628.jpeg")}
       />
       <section className="contact-page">
-        <form>
+        <form onSubmit={sendToWhatsApp}>
           <label>
             Nom
-            <input placeholder="Votre nom" />
+            <input name="name" placeholder="Votre nom complet" required />
+          </label>
+          <label>
+            Entreprise
+            <input name="company" placeholder="Nom de votre entreprise" />
+          </label>
+          <label>
+            Téléphone
+            <input name="phone" placeholder="+213..." type="tel" required />
           </label>
           <label>
             Email
-            <input placeholder="email@entreprise.com" type="email" />
+            <input name="email" placeholder="email@entreprise.com" type="email" required />
           </label>
           <label>
             Type de service
-            <select>
+            <select name="service">
               {services.map((service) => (
-                <option key={service.slug}>{service.title}</option>
+                <option key={service.slug} value={service.title}>
+                  {service.title}
+                </option>
               ))}
             </select>
           </label>
           <label>
             Message
-            <textarea placeholder="Charge, dimensions, ville, delai..." />
+            <textarea
+              name="message"
+              placeholder="Décrivez la cargaison, les dimensions, le lieu, le délai et les contraintes du projet..."
+              required
+            />
           </label>
-          <button className="primary-action primary-action--dark" type="button">
-            Envoyer la demande
-            <Mail size={18} />
+          <button className="primary-action primary-action--dark" type="submit">
+            Envoyer sur WhatsApp
+            <MessageCircle size={18} />
           </button>
         </form>
         <div className="contact-panel">
           <p className="section-kicker">Votre partenaire logistique</p>
           <h2>Équipe projet WHTL</h2>
-          <span>Coordination en Algérie · Projets nationaux et internationaux</span>
+          <p className="contact-panel__intro">
+            Notre équipe vous accompagne pour vos opérations en Algérie et à l'international.
+          </p>
+          <div className="contact-details">
+            <a href="mailto:groupe@whtl-dz.com">
+              <Mail size={21} />
+              <span>
+                <small>E-mail</small>
+                groupe@whtl-dz.com
+              </span>
+            </a>
+            <a href="tel:+213561618238">
+              <Phone size={21} />
+              <span>
+                <small>Appeler</small>
+                +213 561 618 238
+              </span>
+            </a>
+            <a href="https://wa.me/213561618238" target="_blank" rel="noreferrer">
+              <MessageCircle size={21} />
+              <span>
+                <small>WhatsApp</small>
+                Écrire à WHTL
+              </span>
+            </a>
+            <div>
+              <Clock3 size={21} />
+              <span>
+                <small>Horaires</small>
+                Dimanche à jeudi · 8h00 à 16h00
+              </span>
+            </div>
+          </div>
         </div>
       </section>
     </>
@@ -1352,6 +1435,11 @@ function Footer({ navigate }: { navigate: (path: string) => void }) {
         <span className="brand-mark">W</span>
         <strong>WHTL</strong>
         <p>Freight forwarding, consignation maritime, transport exceptionnel et Heavy Lift.</p>
+        <div className="footer-contact">
+          <a href="mailto:groupe@whtl-dz.com">groupe@whtl-dz.com</a>
+          <a href="tel:+213561618238">+213 561 618 238</a>
+          <span>Dimanche à jeudi · 8h00 à 16h00</span>
+        </div>
       </div>
       <div className="footer-columns">
         <div>

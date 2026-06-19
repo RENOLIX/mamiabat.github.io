@@ -1314,12 +1314,63 @@ img {
 }
 
 .contact-panel h2 {
+  margin: 0;
   font-size: clamp(2rem, 4vw, 4.2rem);
   overflow-wrap: anywhere;
 }
 
-.contact-panel span {
-  font-weight: 950;
+.contact-panel__intro {
+  max-width: 540px;
+  margin: 0 0 10px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.contact-details {
+  display: grid;
+  gap: 1px;
+  margin-top: 12px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.contact-details > a,
+.contact-details > div {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  min-height: 84px;
+  background: #c91b13;
+  padding: 18px 20px;
+  color: #ffffff;
+}
+
+.contact-details > a {
+  transition:
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.contact-details > a:hover {
+  background: #111111;
+}
+
+.contact-details span,
+.contact-details small {
+  display: block;
+  min-width: 0;
+}
+
+.contact-details span {
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.contact-details small {
+  margin-bottom: 5px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.68rem;
   text-transform: uppercase;
 }
 
@@ -1347,6 +1398,28 @@ img {
   margin: 0;
   color: rgba(255, 255, 255, 0.64);
   line-height: 1.6;
+}
+
+.footer-contact {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+.footer-contact a {
+  width: fit-content;
+  color: #ffffff;
+  font-weight: 850;
+}
+
+.footer-contact a:hover {
+  color: #e32219;
+}
+
+.footer-contact span {
+  color: rgba(255, 255, 255, 0.58);
+  line-height: 1.5;
 }
 
 .footer-columns {
