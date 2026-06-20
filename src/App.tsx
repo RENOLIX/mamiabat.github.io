@@ -387,11 +387,16 @@ function pathToPage(pathname: string): NavPage {
   return "home";
 }
 
+function normalizePath(pathname: string) {
+  if (pathname === "/") return pathname;
+  return pathname.replace(/\/+$/, "");
+}
+
 function useRoute() {
-  const [pathname, setPathname] = useState(window.location.pathname);
+  const [pathname, setPathname] = useState(normalizePath(window.location.pathname));
 
   useEffect(() => {
-    const update = () => setPathname(window.location.pathname);
+    const update = () => setPathname(normalizePath(window.location.pathname));
     window.addEventListener("popstate", update);
     return () => window.removeEventListener("popstate", update);
   }, []);
