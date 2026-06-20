@@ -5,6 +5,7 @@ import {
   ChevronRight,
   Clock3,
   Factory,
+  Languages,
   Mail,
   Menu,
   MessageCircle,
@@ -20,6 +21,10 @@ import {
   Zap,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import AdminPage from "./AdminPage";
+import { useSiteLanguage } from "./i18n";
+import { NewsHomeBlock, NewsPage } from "./News";
+import type { Language } from "./supabase";
 
 type NavPage =
   | "home"
@@ -29,6 +34,8 @@ type NavPage =
   | "resources"
   | "about"
   | "contact"
+  | "news"
+  | "admin"
   | "service"
   | "equipment-detail";
 
@@ -375,6 +382,8 @@ function pathToPage(pathname: string): NavPage {
   if (pathname === "/resources") return "resources";
   if (pathname === "/about") return "about";
   if (pathname === "/contact") return "contact";
+  if (pathname === "/news") return "news";
+  if (pathname === "/admin") return "admin";
   return "home";
 }
 
@@ -436,11 +445,20 @@ function LinkButton({
 
 function App() {
   const { page, pathname, navigate } = useRoute();
+  const [language, setLanguageState] = useState<Language>(
+    () => (window.localStorage.getItem("whtl-language") as Language) || "fr",
+  );
   const [menuOpen, setMenuOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
   const scrollY = useScrollY();
   const serviceSlug = pathname.split("/services/")[1];
   const equipmentSlug = pathname.split("/equipment/")[1];
+  const setLanguage = (nextLanguage: Language) => {
+    window.localStorage.setItem("whtl-language", nextLanguage);
+    document.documentElement.lang = nextLanguage;
+    setLanguageState(nextLanguage);
+  };
+  useSiteLanguage(language, page === "admin");
 
   useEffect(() => {
     const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
@@ -448,6 +466,10 @@ function App() {
       canonical.href = `https://whtl-dz.com${pathname === "/" ? "/" : pathname}`;
     }
   }, [pathname]);
+
+  if (page === "admin") {
+    return <AdminPage language={language} setLanguage={setLanguage} />;
+  }
 
   return (
     <div className="site-shell">
@@ -458,12 +480,21 @@ function App() {
         megaOpen={megaOpen}
         setMegaOpen={setMegaOpen}
         solid={scrollY > 36 || page !== "home"}
+        language={language}
+        setLanguage={setLanguage}
       />
       {megaOpen && <MegaMenu navigate={navigate} />}
-      {menuOpen && <MobileMenu navigate={navigate} close={() => setMenuOpen(false)} />}
+      {menuOpen && (
+        <MobileMenu
+          navigate={navigate}
+          close={() => setMenuOpen(false)}
+          language={language}
+          setLanguage={setLanguage}
+        />
+      )}
 
       <main>
-        {page === "home" && <HomePage navigate={navigate} />}
+        {page === "home" && <HomePage navigate={navigate} language={language} />}
         {page === "solutions" && <SolutionsPage navigate={navigate} />}
         {page === "case-studies" && <CaseStudiesPage navigate={navigate} />}
         {page === "equipment" && <EquipmentPage navigate={navigate} />}
@@ -472,7 +503,8 @@ function App() {
         )}
         {page === "resources" && <ResourcesPage navigate={navigate} />}
         {page === "about" && <AboutPage navigate={navigate} />}
-        {page === "contact" && <ContactPage />}
+        {page === "contact" && <ContactPage language={language} />}
+        {page === "news" && <NewsPage language={language} />}
         {page === "service" && <ServicePage slug={serviceSlug} navigate={navigate} />}
       </main>
 
@@ -488,6 +520,8 @@ function Header({
   megaOpen,
   setMegaOpen,
   solid,
+  language,
+  setLanguage,
 }: {
   navigate: (path: string) => void;
   menuOpen: boolean;
@@ -495,7 +529,11 @@ function Header({
   megaOpen: boolean;
   setMegaOpen: (value: boolean) => void;
   solid: boolean;
+  language: Language;
+  setLanguage: (language: Language) => void;
 }) {
+  const [languageOpen, setLanguageOpen] = useState(false);
+
   return (
     <header className={`topbar ${solid ? "topbar--solid" : ""}`}>
       <LinkButton className="brand" to="/" navigate={navigate}>
@@ -520,12 +558,50 @@ function Header({
         <LinkButton className="nav-link" to="/about" navigate={navigate}>
           A propos
         </LinkButton>
+        <LinkButton className="nav-link" to="/news" navigate={navigate}>
+          News
+        </LinkButton>
       </nav>
 
       <div className="topbar-actions">
-        <button className="language-button">FR</button>
+        <div className="language-menu" data-no-translate>
+          <button
+            className="language-button"
+            onClick={() => setLanguageOpen((open) => !open)}
+            aria-label="Language"
+            aria-expanded={languageOpen}
+          >
+            <Languages size={17} />
+            {language.toUpperCase()}
+            <ChevronDown size={14} />
+          </button>
+          {languageOpen && (
+            <div className="language-dropdown">
+              <button
+                className={language === "fr" ? "is-active" : ""}
+                onClick={() => {
+                  setLanguage("fr");
+                  setLanguageOpen(false);
+                }}
+              >
+                <span>FR</span>
+                Français
+              </button>
+              <button
+                className={language === "en" ? "is-active" : ""}
+                onClick={() => {
+                  setLanguage("en");
+                  setLanguageOpen(false);
+                }}
+              >
+                <span>EN</span>
+                English
+              </button>
+            </div>
+          )}
+        </div>
         <LinkButton className="contact-button" to="/contact" navigate={navigate}>
-          Contact
+          Devis
         </LinkButton>
         <button
           className="icon-button mobile-only"
@@ -579,9 +655,13 @@ function MegaMenu({ navigate }: { navigate: (path: string) => void }) {
 function MobileMenu({
   navigate,
   close,
+  language,
+  setLanguage,
 }: {
   navigate: (path: string) => void;
   close: () => void;
+  language: Language;
+  setLanguage: (language: Language) => void;
 }) {
   const go = (path: string) => {
     close();
@@ -595,12 +675,23 @@ function MobileMenu({
       <button onClick={() => go("/equipment")}>Equipements</button>
       <button onClick={() => go("/resources")}>Ressources</button>
       <button onClick={() => go("/about")}>A propos</button>
-      <button onClick={() => go("/contact")}>Contact</button>
+      <button onClick={() => go("/news")}>News</button>
+      <button onClick={() => go("/contact")}>Devis</button>
+      <div className="mobile-language" data-no-translate>
+        <button className={language === "fr" ? "is-active" : ""} onClick={() => setLanguage("fr")}>FR</button>
+        <button className={language === "en" ? "is-active" : ""} onClick={() => setLanguage("en")}>EN</button>
+      </div>
     </nav>
   );
 }
 
-function HomePage({ navigate }: { navigate: (path: string) => void }) {
+function HomePage({
+  navigate,
+  language,
+}: {
+  navigate: (path: string) => void;
+  language: Language;
+}) {
   const [activeSector, setActiveSector] = useState<SectorKey>("energy");
   const active = useMemo(
     () => sectors.find((sector) => sector.key === activeSector) ?? sectors[0],
@@ -693,6 +784,7 @@ function HomePage({ navigate }: { navigate: (path: string) => void }) {
       <PartnersBlock />
       <TalkToUsBlock navigate={navigate} />
       <UsedEquipmentBlock navigate={navigate} />
+      <NewsHomeBlock language={language} navigate={navigate} />
       <MediaGallery />
       <CasesPreview navigate={navigate} />
       <TransitionBlock navigate={navigate} />
@@ -1302,7 +1394,7 @@ function AboutPage({ navigate }: { navigate: (path: string) => void }) {
   );
 }
 
-function ContactPage() {
+function ContactPage({ language }: { language: Language }) {
   const sendToWhatsApp = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -1313,22 +1405,40 @@ function ContactPage() {
     const service = String(form.get("service") ?? "").trim();
     const message = String(form.get("message") ?? "").trim();
 
-    const whatsappMessage = [
-      "Bonjour WHTL,",
-      "",
-      "Je souhaite vous adresser une demande concernant un projet logistique.",
-      "",
-      `Nom : ${name}`,
-      `Entreprise : ${company || "Non renseignée"}`,
-      `Téléphone : ${phone}`,
-      `E-mail : ${email}`,
-      `Service demandé : ${service}`,
-      "",
-      "Description du besoin :",
-      message,
-      "",
-      "Merci de me recontacter afin d'étudier cette demande.",
-    ].join("\n");
+    const whatsappMessage =
+      language === "fr"
+        ? [
+            "Bonjour WHTL,",
+            "",
+            "Je souhaite vous adresser une demande concernant un projet logistique.",
+            "",
+            `Nom : ${name}`,
+            `Entreprise : ${company || "Non renseignée"}`,
+            `Téléphone : ${phone}`,
+            `E-mail : ${email}`,
+            `Service demandé : ${service}`,
+            "",
+            "Description du besoin :",
+            message,
+            "",
+            "Merci de me recontacter afin d'étudier cette demande.",
+          ].join("\n")
+        : [
+            "Hello WHTL,",
+            "",
+            "I would like to submit an inquiry regarding a logistics project.",
+            "",
+            `Name: ${name}`,
+            `Company: ${company || "Not provided"}`,
+            `Phone: ${phone}`,
+            `Email: ${email}`,
+            `Requested service: ${service}`,
+            "",
+            "Project requirements:",
+            message,
+            "",
+            "Please contact me to discuss this request.",
+          ].join("\n");
 
     window.open(
       `https://wa.me/213560117109?text=${encodeURIComponent(whatsappMessage)}`,
