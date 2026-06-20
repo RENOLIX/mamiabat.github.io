@@ -63,6 +63,7 @@ export default function AdminPage({
   const [draft, setDraft] = useState<NewsDraft>(emptyDraft);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
+  const [removedPaths, setRemovedPaths] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
@@ -124,6 +125,7 @@ export default function AdminPage({
     setDraft(emptyDraft);
     setEditingId(null);
     setFiles([]);
+    setRemovedPaths([]);
   };
 
   const editItem = (item: NewsItem) => {
@@ -137,6 +139,7 @@ export default function AdminPage({
       published: item.published,
     });
     setFiles([]);
+    setRemovedPaths([]);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -146,9 +149,10 @@ export default function AdminPage({
     setBusy(true);
     setError("");
     setNotice("");
+    let uploadedPaths: string[] = [];
 
     try {
-      const uploadedPaths = await uploadNewsImages(files, session.access_token);
+      uploadedPaths = await uploadNewsImages(files, session.access_token);
       const payload = { ...draft, image_paths: [...draft.image_paths, ...uploadedPaths] };
 
       if (editingId) {
@@ -159,18 +163,19 @@ export default function AdminPage({
         setNotice(t("Actualité créée.", "News item created."));
       }
 
+      await deleteNewsImages(removedPaths, session.access_token);
       resetEditor();
       await loadData(session);
     } catch (reason) {
+      await deleteNewsImages(uploadedPaths, session.access_token).catch(() => undefined);
       setError(reason instanceof Error ? reason.message : String(reason));
     } finally {
       setBusy(false);
     }
   };
 
-  const removeImage = async (path: string) => {
-    if (!session) return;
-    await deleteNewsImages([path], session.access_token);
+  const removeImage = (path: string) => {
+    setRemovedPaths((current) => [...current, path]);
     setDraft((current) => ({
       ...current,
       image_paths: current.image_paths.filter((item) => item !== path),
