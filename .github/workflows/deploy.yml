@@ -43,6 +43,8 @@ jobs:
             contact
             news
             admin
+            admin/news
+            admin/users
             services/freight-forwarding
             services/ship-agency
             services/special-transport

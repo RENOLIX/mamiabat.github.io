@@ -1,13 +1,17 @@
 import {
   ArrowLeft,
   ImagePlus,
+  LayoutDashboard,
   LogIn,
   LogOut,
+  Menu,
+  Newspaper,
   Pencil,
   Plus,
   Save,
   Trash2,
   UserPlus,
+  Users,
   X,
 } from "lucide-react";
 import { type FormEvent, useCallback, useEffect, useState } from "react";
@@ -41,6 +45,14 @@ type NewsDraft = {
   published: boolean;
 };
 
+type AdminView = "dashboard" | "news" | "users";
+
+function adminViewFromPath(pathname: string): AdminView {
+  if (pathname.includes("/admin/users")) return "users";
+  if (pathname.includes("/admin/news")) return "news";
+  return "dashboard";
+}
+
 const emptyDraft: NewsDraft = {
   title_fr: "",
   title_en: "",
@@ -67,8 +79,26 @@ export default function AdminPage({
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  const [view, setView] = useState<AdminView>(() => adminViewFromPath(window.location.pathname));
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const t = (fr: string, en: string) => (language === "fr" ? fr : en);
+
+  useEffect(() => {
+    const updateView = () => setView(adminViewFromPath(window.location.pathname));
+    window.addEventListener("popstate", updateView);
+    return () => window.removeEventListener("popstate", updateView);
+  }, []);
+
+  const navigateAdmin = (nextView: AdminView) => {
+    const path = nextView === "dashboard" ? "/admin" : `/admin/${nextView}`;
+    window.history.pushState({}, "", path);
+    setView(nextView);
+    setSidebarOpen(false);
+    setError("");
+    setNotice("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   useEffect(() => {
     let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
@@ -129,6 +159,7 @@ export default function AdminPage({
   };
 
   const editItem = (item: NewsItem) => {
+    navigateAdmin("news");
     setEditingId(item.id);
     setDraft({
       title_fr: item.title_fr,
@@ -199,9 +230,10 @@ export default function AdminPage({
   const addUser = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!session) return;
+    const formElement = event.currentTarget;
     setBusy(true);
     setError("");
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(formElement);
 
     try {
       await createAdminUser(
@@ -210,7 +242,7 @@ export default function AdminPage({
         String(form.get("full_name") ?? ""),
         session.access_token,
       );
-      event.currentTarget.reset();
+      formElement.reset();
       setNotice(t("Administrateur ajouté.", "Administrator added."));
       await loadData(session);
     } catch (reason) {
@@ -240,62 +272,190 @@ export default function AdminPage({
 
   if (!session) {
     return (
-      <main className="admin-shell admin-shell--centered">
-        <form className="admin-login" onSubmit={handleLogin}>
-          <div className="admin-login__top">
-            <a href="/" aria-label={t("Retour au site", "Back to website")}>
-              <ArrowLeft size={20} />
-            </a>
-            <div className="admin-language">
-              <button type="button" className={language === "fr" ? "is-active" : ""} onClick={() => setLanguage("fr")}>FR</button>
-              <button type="button" className={language === "en" ? "is-active" : ""} onClick={() => setLanguage("en")}>EN</button>
-            </div>
+      <main className="admin-login-page">
+        <section className="admin-login-visual">
+          <a className="admin-login-back" href="/">
+            <ArrowLeft size={19} />
+            {t("Retour au site", "Back to website")}
+          </a>
+          <div className="admin-login-visual__content">
+            <span className="brand-mark">W</span>
+            <p>WHTL CMS</p>
+            <h2>{t("Pilotez vos actualités depuis un espace sécurisé.", "Manage your news from a secure workspace.")}</h2>
+            <span>
+              {t(
+                "Contenus bilingues, galeries photos et accès administrateurs.",
+                "Bilingual content, photo galleries and administrator access.",
+              )}
+            </span>
           </div>
-          <span className="brand-mark">W</span>
-          <p>WHTL CMS</p>
-          <h1>{t("Connexion administrateur", "Administrator login")}</h1>
-          <label>
-            E-mail
-            <input name="email" type="email" required autoComplete="email" />
-          </label>
-          <label>
-            {t("Mot de passe", "Password")}
-            <input name="password" type="password" required autoComplete="current-password" />
-          </label>
-          {error && <div className="admin-alert admin-alert--error">{error}</div>}
-          <button className="admin-primary" disabled={busy}>
-            <LogIn size={18} />
-            {busy ? t("Connexion...", "Signing in...") : t("Se connecter", "Sign in")}
-          </button>
-        </form>
+        </section>
+
+        <section className="admin-login-panel">
+          <form className="admin-login" onSubmit={handleLogin}>
+            <div className="admin-login__top">
+              <div>
+                <p>{t("Espace privé", "Private workspace")}</p>
+                <strong>{t("Administration WHTL", "WHTL Administration")}</strong>
+              </div>
+              <div className="admin-language">
+                <button type="button" className={language === "fr" ? "is-active" : ""} onClick={() => setLanguage("fr")}>FR</button>
+                <button type="button" className={language === "en" ? "is-active" : ""} onClick={() => setLanguage("en")}>EN</button>
+              </div>
+            </div>
+            <div className="admin-login__title">
+              <h1>{t("Connexion", "Sign in")}</h1>
+              <span>
+                {t(
+                  "Utilisez vos identifiants administrateur pour continuer.",
+                  "Use your administrator credentials to continue.",
+                )}
+              </span>
+            </div>
+            <label>
+              E-mail
+              <input name="email" type="email" placeholder="admin@whtl-dz.com" required autoComplete="email" />
+            </label>
+            <label>
+              {t("Mot de passe", "Password")}
+              <input name="password" type="password" placeholder="••••••••••••" required autoComplete="current-password" />
+            </label>
+            {error && <div className="admin-alert admin-alert--error">{error}</div>}
+            <button className="admin-primary admin-login__submit" disabled={busy}>
+              <LogIn size={18} />
+              {busy ? t("Connexion...", "Signing in...") : t("Se connecter", "Sign in")}
+            </button>
+            <small className="admin-login__security">
+              {t(
+                "Connexion chiffrée et sécurisée par Supabase.",
+                "Encrypted authentication secured by Supabase.",
+              )}
+            </small>
+          </form>
+        </section>
       </main>
     );
   }
 
   return (
-    <main className="admin-shell">
-      <header className="admin-header">
-        <a className="admin-brand" href="/">
+    <main className="admin-shell admin-dashboard">
+      <aside className={`admin-sidebar ${sidebarOpen ? "is-open" : ""}`}>
+        <div className="admin-sidebar__brand">
           <span className="brand-mark">W</span>
-          <span>WHTL Admin</span>
-        </a>
-        <div className="admin-header__actions">
+          <span>
+            <strong>WHTL</strong>
+            <small>Administration</small>
+          </span>
+          <button className="admin-sidebar__close" onClick={() => setSidebarOpen(false)} aria-label={t("Fermer le menu", "Close menu")}>
+            <X size={20} />
+          </button>
+        </div>
+        <nav className="admin-sidebar__nav">
+          <button className={view === "dashboard" ? "is-active" : ""} onClick={() => navigateAdmin("dashboard")}>
+            <LayoutDashboard size={20} />
+            {t("Vue d'ensemble", "Overview")}
+          </button>
+          <button className={view === "news" ? "is-active" : ""} onClick={() => navigateAdmin("news")}>
+            <Newspaper size={20} />
+            {t("Actualités", "News")}
+            <span>{news.length}</span>
+          </button>
+          <button className={view === "users" ? "is-active" : ""} onClick={() => navigateAdmin("users")}>
+            <Users size={20} />
+            {t("Administrateurs", "Administrators")}
+            <span>{profiles.length}</span>
+          </button>
+        </nav>
+        <div className="admin-sidebar__footer">
+          <a href="/" target="_blank" rel="noreferrer">
+            <ArrowLeft size={18} />
+            {t("Voir le site", "View website")}
+          </a>
           <div className="admin-language">
             <button className={language === "fr" ? "is-active" : ""} onClick={() => setLanguage("fr")}>FR</button>
             <button className={language === "en" ? "is-active" : ""} onClick={() => setLanguage("en")}>EN</button>
           </div>
           <button
-            className="admin-icon-button"
+            className="admin-sidebar__logout"
             title={t("Déconnexion", "Sign out")}
             onClick={() => signOut(session.access_token).finally(() => setSession(null))}
           >
             <LogOut size={19} />
+            {t("Déconnexion", "Sign out")}
           </button>
         </div>
-      </header>
+      </aside>
+      {sidebarOpen && <button className="admin-sidebar-backdrop" onClick={() => setSidebarOpen(false)} aria-label={t("Fermer le menu", "Close menu")} />}
 
-      <div className="admin-content">
-        <section className="admin-editor">
+      <div className="admin-workspace">
+        <header className="admin-workspace-header">
+          <button className="admin-menu-button" onClick={() => setSidebarOpen(true)} aria-label={t("Ouvrir le menu", "Open menu")}>
+            <Menu size={22} />
+          </button>
+          <div>
+            <p>WHTL CMS</p>
+            <strong>
+              {view === "dashboard"
+                ? t("Vue d'ensemble", "Overview")
+                : view === "news"
+                  ? t("Actualités", "News")
+                  : t("Administrateurs", "Administrators")}
+            </strong>
+          </div>
+          <span className="admin-workspace-user">{session.user.email}</span>
+        </header>
+
+        <div className="admin-content">
+          {view === "dashboard" && (
+            <section className="admin-overview">
+              <div className="admin-overview__heading">
+                <div>
+                  <p>{t("Tableau de bord", "Dashboard")}</p>
+                  <h1>{t("Bienvenue dans votre espace WHTL", "Welcome to your WHTL workspace")}</h1>
+                </div>
+                <span>{t("Contenu et accès centralisés", "Content and access in one place")}</span>
+              </div>
+
+              <div className="admin-stat-grid">
+                <article>
+                  <Newspaper size={24} />
+                  <strong>{news.length}</strong>
+                  <span>{t("Actualités au total", "Total news items")}</span>
+                </article>
+                <article>
+                  <LayoutDashboard size={24} />
+                  <strong>{news.filter((item) => item.published).length}</strong>
+                  <span>{t("Actualités publiées", "Published news")}</span>
+                </article>
+                <article>
+                  <Users size={24} />
+                  <strong>{profiles.length}</strong>
+                  <span>{t("Administrateurs", "Administrators")}</span>
+                </article>
+              </div>
+
+              <div className="admin-overview-actions">
+                <button className="admin-overview-action" onClick={() => navigateAdmin("news")}>
+                  <span><Plus size={20} /></span>
+                  <div>
+                    <strong>{t("Créer une actualité", "Create a news item")}</strong>
+                    <small>{t("Ajoutez un contenu bilingue et ses photos.", "Add bilingual content and its photos.")}</small>
+                  </div>
+                </button>
+                <button className="admin-overview-action" onClick={() => navigateAdmin("users")}>
+                  <span><UserPlus size={20} /></span>
+                  <div>
+                    <strong>{t("Gérer les accès", "Manage access")}</strong>
+                    <small>{t("Ajoutez et consultez les administrateurs.", "Add and review administrators.")}</small>
+                  </div>
+                </button>
+              </div>
+            </section>
+          )}
+
+          {view === "news" && (
+            <>
+              <section className="admin-editor">
           <div className="admin-section-title">
             <div>
               <p>{t("Gestion éditoriale", "Editorial management")}</p>
@@ -397,9 +557,9 @@ export default function AdminPage({
               {busy ? t("Enregistrement...", "Saving...") : editingId ? t("Enregistrer", "Save changes") : t("Publier", "Publish")}
             </button>
           </form>
-        </section>
+              </section>
 
-        <section className="admin-list">
+              <section className="admin-list">
           <div className="admin-section-title">
             <div>
               <p>{t("Contenu", "Content")}</p>
@@ -423,9 +583,12 @@ export default function AdminPage({
               </article>
             ))}
           </div>
-        </section>
+              </section>
+            </>
+          )}
 
-        <section className="admin-users">
+          {view === "users" && (
+            <section className="admin-users">
           <div className="admin-section-title">
             <div>
               <p>{t("Accès", "Access")}</p>
@@ -451,6 +614,8 @@ export default function AdminPage({
               {t("Ajouter l'administrateur", "Add administrator")}
             </button>
           </form>
+          {error && <div className="admin-alert admin-alert--error">{error}</div>}
+          {notice && <div className="admin-alert admin-alert--success">{notice}</div>}
           <div className="admin-user-list">
             {profiles.map((profile) => (
               <div key={profile.id}>
@@ -459,7 +624,9 @@ export default function AdminPage({
               </div>
             ))}
           </div>
-        </section>
+            </section>
+          )}
+        </div>
       </div>
     </main>
   );

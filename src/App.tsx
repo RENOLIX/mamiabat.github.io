@@ -383,7 +383,7 @@ function pathToPage(pathname: string): NavPage {
   if (pathname === "/about") return "about";
   if (pathname === "/contact") return "contact";
   if (pathname === "/news") return "news";
-  if (pathname === "/admin") return "admin";
+  if (pathname.startsWith("/admin")) return "admin";
   return "home";
 }
 
